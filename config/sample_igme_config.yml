@@ -1,0 +1,13 @@
+title: Cool Project
+author:
+  name: Aaron Sky
+  email: aaronsky@skyaaron.com
+  github: https://github.com/aaronsky/
+description: A repo to stand the test of time
+language: C#
+banner: http://something.com/
+tags:
+  - Math
+  - Data Structures
+extra_resources:
+  - King Piccolo
