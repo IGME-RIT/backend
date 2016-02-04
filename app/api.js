@@ -16,13 +16,15 @@ app.get('/repos', function(req, res) {
 
 app.get('/repos/:title', function(req, res) {
   var title = req.params.title;
-  title = title.replace(/\+|\%20/g,' ');
+  title = title.replace(/\+|\%20/gi, ' ');
   var results = [];
-  for (var repo in Configuration.repos) {
-    if (repo.title == title) {
-      results.push(repo);
+  Configuration.repos.forEach(function(repo, index, repos) {
+    if (repo && repo.title) {
+      if (repo.title.toLowerCase().indexOf(title) !== -1) {
+        results.push(repo);
+      }
     }
-  }
+  });
   res.send(results);
 });
 
