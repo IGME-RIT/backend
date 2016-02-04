@@ -2,6 +2,7 @@
 var GitHub = require('github');
 var YAML = require('yamljs');
 var Author = require('./author.js');
+var ImageSet = require('./imageset.js');
 
 const GITHUB_DEFAULT = 'https://github.com/';
 
@@ -32,26 +33,39 @@ Repo.prototype.initConfig = function() {
         repo: repo,
         path: 'igme_config.yml'
       };
+      var that = this;
       github.repos.getContent(options, function(err, res) {
         if (err) {
-          console.log('content fetch failed');
-          console.log(err);
+          console.error('content fetch failed');
+          console.error(err);
         }
         if (res && res.content) {
-          var config = YAML.parse(atob(res.content));
-          if (config) {
-            this.title = config.title || this.title;
-            this.author = null;
-            if (config.author) {
-              this.author = new Author(config.author.name,
-                                       config.author.email,
-                                       config.author.github);
+          var encoded = new Buffer(res.content, 'base64');
+          var decoded = encoded.toString();
+          if (decoded) {
+            var config = YAML.parse(decoded);
+            if (config) {
+              that.title = config.title || that.title;
+              that.author = null;
+              that.author = config.author ?
+                new Author(config.author.name,
+                  config.author.email,
+                  config.author.github) :
+                new Author();
+              that.description = config.description || 'No description found';
+              that.language = config.language || 'None';
+              that.image = config.image ?
+                new ImageSet(config.image.icon,
+                  config.image.banner) :
+                new ImageSet();
+              that.tags = config.tags || [];
+              that.extra_resources = config.extra_resources || [];
+              console.log('Parsed the project config for ' + that.title);
+            } else {
+              console.error('Could not parse YAML for ' + decoded);
             }
-            this.description = config.description || 'No description found';
-            this.language = config.language || 'None';
-            this.banner = config.banner || '#';
-            this.tags = config.tags || [];
-            this.extra_resources = config.extra_resources || [];
+          } else {
+            console.error('Could not decode ' + encoded);
           }
         }
       });
