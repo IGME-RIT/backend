@@ -1,5 +1,9 @@
 //require('./extensions.js');
+
+var Configuration = require('./app/config.js');
+
 module.exports = function(repos) {
+  var repos = repos || Configuration.repos;
   var express = require('express');
 
   var app = express();

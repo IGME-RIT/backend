@@ -1,5 +1,2 @@
-
-var Configuration = require('./app/config.js');
-
-var api = require('./app/api.js')(Configuration.repos);
+var api = require('./app/api.js')();
 api.listen(process.env.PORT || 5000);
