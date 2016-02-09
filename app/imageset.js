@@ -1,4 +1,4 @@
-ImageSet = (function() {
+var ImageSet = (function() {
   function ImageSet(icon, banner) {
     this.icon = icon || '';
     this.banner = banner || '';

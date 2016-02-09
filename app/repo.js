@@ -1,4 +1,3 @@
-//var Enum = require('../lib/enum.js');
 var GitHub = require('github');
 var YAML = require('yamljs');
 var Author = require('./author.js');
