@@ -2,4 +2,4 @@
 set -e
 
 npm install
-node ./index.js
+node .

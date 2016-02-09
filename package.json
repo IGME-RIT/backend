@@ -4,7 +4,7 @@
   "description": "Backend for IGME tutorial project",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
+    "start": "./bin/jeff",
     "test": "mocha tests/ && exit 0"
   },
   "repository": {
