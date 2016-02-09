@@ -1,9 +1,18 @@
 //require('./extensions.js');
 
-var Configuration = require('./app/config.js');
+var Configuration = require('./config.js');
 
 module.exports = function(repos) {
-  var repos = repos || Configuration.repos;
+  if (!repos) {
+    var config = Configuration.getInstance().getRepos(function (err, repo_arr) {
+      if (err) {
+        console.error('Repos could not be loaded');
+      } else {
+        repos = repo_arr;
+      }
+    })
+  }
+
   var express = require('express');
 
   var app = express();

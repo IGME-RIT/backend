@@ -2,7 +2,7 @@ var fs = require('fs');
 var YAML = require('yamljs');
 var sync = require('./sync.js');
 
-var loadFile = function (path, file, ext) {
+var loadFile = function(path, file, ext) {
   if (ext == 'json')
     return require(path + file + '.' + ext);
   else if (ext == 'yml')
@@ -11,12 +11,40 @@ var loadFile = function (path, file, ext) {
     return {};
 };
 
-var Configuration = {
-    excluded: loadFile('config/', 'excluded_repos', 'yml')
-};
+var Configuration = (function() {
+  var ConfigurationPrivate = function() {
+    this.excluded = loadFile('config/', 'excluded_repos', 'yml');
+  };
+  ConfigurationPrivate.prototype.getRepos = function(cb) {
+    if (this.repos) {
+      cb(null, this.repos);
+    } else {
+      sync(this.excluded, function(err, repos) {
+        if (err) {
+          cb(err, null);
+        } else {
+          this.repos = repos;
+          cb(null, this.repos);
+        }
+      });
+    }
+  };
 
-require('./sync.js')(Configuration.excluded, function (err, repos) {
-  Configuration.repos = repos;
-});
+  var instance;
+
+  function initInstance() {
+    var inst = new ConfigurationPrivate();
+    return inst;
+  }
+
+  return {
+    getInstance: function() {
+      if (!instance) {
+        instance = initInstance();
+      }
+      return instance;
+    }
+  };
+})();
 
 module.exports = Configuration;
