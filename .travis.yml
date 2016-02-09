@@ -1,7 +1,14 @@
 language: node_js
 node_js:
-  - "4.1"
-  - "4.0"
-  - "0.12"
-  - "0.11"
-  - "0.10"
+- '4.1'
+- '4.0'
+- '0.12'
+- '0.11'
+- '0.10'
+deploy:
+  provider: heroku
+  api_key:
+    secure: iYnW1caxaSh31RckfYc9UQZpBrXBz1N0V1DVo1S44skqD4B5sAff5F/+81K+Xba1cRceWp3augl/ngK9Xaeck9XRns9TrS5yjQA3xRCRCfsA7kqY39O9Gf1QKiHOCajjF8Ai4n4Z1WonLH8J+Khmh6klkT3a2EPR9NCWnjNSHAxlIXbpPWaQwkc1+z+DPw8Q6HoZi79V+1iXAGf5ouJgE57bpPFJDAqc7AlMfiM1d332Cw9brBrdrPhQHMuks7/TW3Q4emKKfacnQodmnj7UAw9bYC5Hq7RLZNqt0pKSsBoTX+MNdi1IzHcG/BU8TgMz9tvQud4yQg5f+sTDhrSIRrJEFbdj+g81bTl/NOf/l9tvh6fX7n3U5DriKTBzHS1/shdMi15f4Q9sj2jvEXA0Ixx2f38K/0EflMqMnlCNA23TyRaCXCe+/M/o8sblgYv+M8EZd4p5oZs9msHC+65SNeoXdUDj1XQEPtoNcQ44WEzMCKFSIppkknJXw0X0N3srL/teVKRoyONeaMqjaEO4GaMhimhZImMlgE2+Pn/aF1N7ZIOCqm08lWvioxuRIKWEbyWypTy7oR90kVoohVeTyfbmLQtcxzNjjwwjDq3m0EE+R0s7qznWz2sd8JeMfjqN1LF74I8Qwuw1wpxu9bU+1yXgGq3FhiOjLPLqaEfCgCY=
+  app: stormy-basin-72119
+  on:
+    repo: IGME-RIT/backend
