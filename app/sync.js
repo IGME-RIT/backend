@@ -13,7 +13,10 @@ module.exports = function(excluded, completion) {
       completion(err, null);
       return;
     }
-    for (var repo_raw of res) {
+    var i = 0;
+    var len = res.length;
+    while (i < len) {
+      var repo_raw = res[i];
       if (!shouldExecute) {
         return;
       }
@@ -26,6 +29,8 @@ module.exports = function(excluded, completion) {
         repo.initConfig();
         repos.push(repo);
       }
+
+      i += 1;
     }
     if (res.length < perPage) {
       completion(err, repos);
