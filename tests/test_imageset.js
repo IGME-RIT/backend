@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 
-var ImageSet = require('../app/imageset.js');
+var ImageSet = require('../app/models/imageset.js');
 
 describe('ImageSet', function () {
   context('#constructor', function () {

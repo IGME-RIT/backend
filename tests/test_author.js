@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 
-var Author = require('../app/author.js');
+var Author = require('../app/models/author.js');
 
 describe('Author', function () {
   context('#constructor', function () {
