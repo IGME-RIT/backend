@@ -1,6 +1,6 @@
 var fs = require('fs');
 var YAML = require('yamljs');
-var sync = require('./sync.js');
+var sync = require('../helpers/sync.js');
 
 var loadFile = function(path, file, ext) {
   if (ext == 'json')

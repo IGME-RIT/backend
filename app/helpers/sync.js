@@ -1,6 +1,6 @@
-var repo = require('./repo.js');
+var github = require('../services/github.js').client;
+var repo = require('../models/repo.js');
 var Repo = repo.Repo;
-var github = repo.github;
 
 module.exports = function(excluded, completion) {
   var current = 0;
@@ -26,10 +26,8 @@ module.exports = function(excluded, completion) {
         var link = repo_raw.html_url;
         var config = repo_raw.contents_url;
         var repo = new Repo(title, link, config);
-        repo.initConfig();
         repos.push(repo);
       }
-
       i += 1;
     }
     if (res.length < perPage) {

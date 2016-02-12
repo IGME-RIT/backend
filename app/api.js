@@ -1,6 +1,6 @@
 //require('./extensions.js');
 
-var Configuration = require('./config.js');
+var Configuration = require('./models/config.js');
 
 module.exports = function(repos) {
   if (!repos) {
