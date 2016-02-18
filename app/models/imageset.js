@@ -1,14 +1,25 @@
 var mongoose = require('mongoose');
 
-function ImageSet(icon, banner) {
-  this.icon = icon || '';
-  this.banner = banner || '';
-}
-ImageSet.schema = function() {
-  return new mongoose.Schema({
-    icon: String,
-    banner: String
-  });
-};
+var ImageSetSchema = new mongoose.Schema({
+  icon: {type: String, default: ''},
+  banner: {type: String, default: ''}
+});
 
-module.exports = ImageSet;
+var ImageSet = mongoose.model('ImageSet', ImageSetSchema);
+
+ImageSetSchema.pre('save', function (next) {
+    var that = this;
+    ImageSet.find({ icon: that.icon, banner: that.banner }, function (err, docs) {
+        if (!docs.length) {
+            next();
+        } else {
+            console.log('ImageSet exists: ', that.name);
+            next(new Error("ImageSet exists!"));
+        }
+    });
+});
+
+module.exports = {
+  ImageSet: ImageSet,
+  Schema: ImageSetSchema
+};

@@ -2,4 +2,11 @@
 set -e
 
 npm install
+
+if [ "$1" = "--heroku" ]; then
+  echo "This is a Heroku execution!"
+else
+  source ./bin/credentials
+fi
+
 node .

@@ -1,14 +1,23 @@
 var mongoose = require("mongoose");
 
-var uriStr = process.env.MONGOLAB_URI ||
-  process.env.MONGOHQ_URL ||
-  'mongodb://localhost/HelloMongoose';
+/*
+Options: 
+{
+    open: [Function],
+    error: [Function]
+}
+*/
+module.exports = function (opts) {
+    var uriStr = process.env.MONGOLAB_URI ||
+    process.env.MONGOHQ_URL;
+    if (!uriStr)
+        throw new Error('No MongoDB URI could be found. Check your environment variables.');
+    var db = mongoose.connection;
 
-mongoose.connect(uriStr, function (err, res) {
-  if (err) { 
-    console.error ('ERROR connecting to: ' + uriStr + '. ' + err);
-  } else {
-    console.log ('Successfully connected to: ' + uriStr);
-  }
-});
-
+    db.on('error', opts.error || console.error.bind(console, 'connection error:'));
+    db.once('open', opts.open || function () {});
+    
+    mongoose.connect(uriStr);
+    
+    return db;
+};
