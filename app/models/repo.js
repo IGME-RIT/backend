@@ -84,7 +84,7 @@ RepoSchema.pre('save', function (next) {
     });
 });
 
-module.exports.Repo = {
+module.exports = {
     Repo: Repo,
     Schema: RepoSchema
 };

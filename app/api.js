@@ -17,22 +17,60 @@ module.exports = function (repos) {
     });
 
     app.get('/repos', function (req, res) {
-        res.send(repos);
+        if (repos) {
+            res.send(repos);
+        } else if (Configuration.initialized) {
+            Configuration.search(null, function (err, results) {
+                if (err) {
+                    res.send({
+                        error: true,
+                        message: err
+                    });
+                    console.error(err);
+                    return;
+                }
+                res.send(results);
+            });
+        } else {
+            res.send({
+                error: true,
+                message: 'Configuration is still warming up!'
+            });
+        }
+
     });
 
     app.get('/repos/:title', function (req, res) {
-
         var title = req.params.title;
         title = title.replace(/\+|\%20/gi, ' ');
-        var results = [];
-        repos.forEach(function (repo) {
-            if (repo && repo.title) {
-                if (repo.title.toLowerCase().indexOf(title) !== -1) {
-                    results.push(repo);
+        if (repos) {
+            var results = [];
+            repos.forEach(function (repo) {
+                if (repo && repo.title) {
+                    if (repo.title.toLowerCase().indexOf(title) !== -1) {
+                        results.push(repo);
+                    }
                 }
-            }
-        });
-        res.send(results);
+            });
+            res.send(results);
+        } else if (Configuration.initialized) {
+            Configuration.search({ title: title }, function (err, results) {
+                if (err) {
+                    res.send({
+                        error: true,
+                        message: err
+                    });
+                    console.error(err);
+                    return;
+                }
+                res.send(results);
+            });
+        } else {
+            res.send({
+                error: true,
+                message: 'Configuration is still warming up!'
+            });
+        }
     });
 
     return app;

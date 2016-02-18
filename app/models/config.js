@@ -1,5 +1,6 @@
 var fs = require('fs');
 var YAML = require('yamljs');
+var Repo = require('./repo.js').Repo;
 var sync = require('../helpers/sync.js');
 var db = require('../services/mongo.js')({
     open: open,
@@ -28,9 +29,13 @@ function open() {
 }
 
 var Configuration = (function () {
-    var ConfigurationPrivate = function () {
+    function ConfigurationPrivate() {
         this.excluded = loadFile('config/', 'excluded_repos', 'yml');
         this.initialized = false;
+    }
+
+    ConfigurationPrivate.prototype.search = function (opts, cb) {
+        Repo.find(opts || {}, cb);
     };
 
     var instance;

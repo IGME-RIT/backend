@@ -1,6 +1,5 @@
 var github = require('../services/github.js').client;
-var repo = require('../models/repo.js');
-var Repo = repo.Repo;
+var Repo = require('../models/repo.js').Repo;
 
 module.exports = function(excluded, completion) {
     var current = 0;
@@ -24,7 +23,7 @@ module.exports = function(excluded, completion) {
                 var title = repo_raw.name;
                 var link = repo_raw.html_url;
                 var config = repo_raw.contents_url;
-                var repo = new Repo.Repo({
+                var repo = new Repo({
                     title: title,
                     link: link
                 });
