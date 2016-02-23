@@ -17,7 +17,7 @@ function loadFile(path, file, ext) {
         return {};
 }
 
-function onConnect () {
+function onConnect() {
     Configuration.getInstance().initialized = true;
 }
 
@@ -38,14 +38,16 @@ var Configuration = (function () {
 
     ConfigurationPrivate.prototype.sync = function (cb) {
         this.initialized = false;
-        open(function (err, repoCount) {
-            if (err) {
-                console.error(err);
-                cb(err, null);
-            } else {
-                Configuration.getInstance().initialized = true;
-                cb(null, repoCount);
-            }
+        Repo.remove({}, function (err) {
+            open(function (err, repoCount) {
+                if (err) {
+                    console.error(err);
+                    cb(err, null);
+                } else {
+                    Configuration.getInstance().initialized = true;
+                    cb(null, repoCount);
+                }
+            });
         });
     }
 
