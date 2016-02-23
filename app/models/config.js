@@ -3,7 +3,7 @@ var YAML = require('yamljs');
 var Repo = require('./repo.js').Repo;
 var sync = require('../helpers/sync.js');
 var db = require('../services/mongo.js')({
-    open: open,
+    onConnect: onConnect,
     error: null
 });
 var lastSyncTime = process.env.LAST_SYNC || 0;
@@ -17,15 +17,13 @@ function loadFile(path, file, ext) {
         return {};
 }
 
-function open() {
+function onConnect () {
+    Configuration.getInstance().initialized = true;
+}
+
+function open(cb) {
     var excluded = Configuration.getInstance().excluded;
-    sync(excluded, function (err) {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        Configuration.getInstance().initialized = true;
-    });
+    sync(excluded, cb);
 }
 
 var Configuration = (function () {
@@ -37,6 +35,19 @@ var Configuration = (function () {
     ConfigurationPrivate.prototype.search = function (opts, cb) {
         Repo.find(opts || {}, cb);
     };
+
+    ConfigurationPrivate.prototype.sync = function (cb) {
+        this.initialized = false;
+        open(function (err, repoCount) {
+            if (err) {
+                console.error(err);
+                cb(err, null);
+            } else {
+                Configuration.getInstance().initialized = true;
+                cb(null, repoCount);
+            }
+        });
+    }
 
     var instance;
 

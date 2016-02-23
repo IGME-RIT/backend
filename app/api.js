@@ -73,5 +73,21 @@ module.exports = function (repos) {
         }
     });
 
+    app.get('/sync', function (req, res) {
+        Configuration.sync(function (err, repoCount) {
+            if (err) {
+                res.send({
+                    error: true,
+                    message: err
+                });
+            } else {
+                res.send({
+                    message: repoCount + ' repos were synced.',
+                    serverTime: Date.now()
+                });
+            }
+        });
+    });
+
     return app;
 }

@@ -21,7 +21,6 @@ module.exports = {
       console.error('Can\'t get a config without a destination.');
       return;
     }
-    var that = this;
     github.repos.getContent({
       user: options.user,
       repo: options.repo,

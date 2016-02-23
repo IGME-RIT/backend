@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var Q = require('q');
 var github = require('../services/github.js');
 var GITHUB_DEFAULT = require('../helpers/constants.js').GITHUB_DEFAULT;
 var Author = require('./author.js');
@@ -40,14 +41,13 @@ RepoSchema.methods.initConfig = function (config_url) {
     var user = parsed[0];
     var repo = parsed[1];
     var that = this;
-    github.getConfig({
+    var deferred = Q.defer();
+    var configPromise = Q.nfbind(github.getConfig);
+    configPromise({
         user: user,
         repo: repo
-    }, function (err, config) {
-        if (err) {
-            console.error(err);
-            return;
-        }
+    })
+    .then(function (config) {
         that.title = config.title || that.title;
         that.author = config.author ?
             new Author.Author({
@@ -67,7 +67,12 @@ RepoSchema.methods.initConfig = function (config_url) {
         that.tags = config.tags || [];
         that.extra_resources = config.extra_resources || [];
         console.log('Parsed the project config for ' + that.title);
+        deferred.resolve();
+    })
+    .catch(function (err) {
+        console.error(err);
     });
+    return deferred.promise;
 };
 
 var Repo = mongoose.model('Repo', RepoSchema);
@@ -77,9 +82,6 @@ RepoSchema.pre('save', function (next) {
     Repo.find({ title: that.title, link: that.link }, function (err, docs) {
         if (!docs.length) {
             next();
-        } else {
-            console.log('ImageSet exists: ', that.name);
-            next(new Error("ImageSet exists!"));
         }
     });
 });
