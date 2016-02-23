@@ -1,1 +1,1 @@
-web: ./bin/jeff
+web: ./bin/jeff --heroku
