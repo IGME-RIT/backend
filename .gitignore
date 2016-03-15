@@ -4,3 +4,7 @@ bin/credentials
 .DS_Store*
 *.log*
 .vscode
+*.crt
+*.key
+*.pem
+*.csr

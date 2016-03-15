@@ -1,7 +1,7 @@
 var Q = require('q');
 
-var github = require('../services/github.js').client;
-var Repo = require('../models/repo.js').Repo;
+var github = require('../services/github').client;
+var Repo = require('../models/repo').Repo;
 
 module.exports = function (excluded, completion) {
     var currentPage = 0;

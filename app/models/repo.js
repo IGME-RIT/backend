@@ -1,9 +1,9 @@
 var mongoose = require('mongoose');
 var Q = require('q');
-var github = require('../services/github.js');
-var GITHUB_DEFAULT = require('../helpers/constants.js').GITHUB_DEFAULT;
-var Author = require('./author.js');
-var ImageSet = require('./imageset.js');
+var github = require('../services/github');
+var GITHUB_DEFAULT = require('../helpers/constants').GITHUB_DEFAULT;
+var Author = require('./author');
+var ImageSet = require('./imageset');
 
 var parseUrl = function (url) {
     var comps = url.split('/', 6);

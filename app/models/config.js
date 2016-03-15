@@ -1,8 +1,8 @@
 var fs = require('fs');
 var YAML = require('yamljs');
-var Repo = require('./repo.js').Repo;
-var sync = require('../helpers/sync.js');
-var db = require('../services/mongo.js')({
+var Repo = require('./repo').Repo;
+var sync = require('../helpers/sync');
+var db = require('../services/mongo')({
     onConnect: onConnect,
     error: null
 });

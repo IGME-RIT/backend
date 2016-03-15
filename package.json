@@ -4,7 +4,7 @@
   "description": "Backend for IGME tutorial project",
   "main": "index.js",
   "scripts": {
-    "start": "./bin/jeff",
+    "start": "./bin/atlas",
     "test": "mocha tests/ && exit 0"
   },
   "repository": {
@@ -20,7 +20,10 @@
   "dependencies": {
     "express": "^4.13.4",
     "github": "^0.2.4",
+    "lodash": "^4.6.1",
     "mongoose": "^4.4.4",
+    "passport": "^0.3.2",
+    "passport-github2": "^0.1.10",
     "q": "^1.4.1",
     "yamljs": "^0.2.4"
   },
