@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Q = require('q');
-var github = require('../services/github');
 var GITHUB_DEFAULT = require('../helpers/constants').GITHUB_DEFAULT;
 var Author = require('./author');
 var ImageSet = require('./imageset');
@@ -33,19 +32,11 @@ var RepoSchema = new mongoose.Schema({
     extra_resources: [String]
 });
 
-RepoSchema.methods.initConfig = function (config_url) {
-    if (!config_url) {
-        throw new Error("no url supplied");
-    }
-    var parsed = parseUrl(config_url);
-    var user = parsed[0];
-    var repo = parsed[1];
-    var that = this;
-    var deferred = Q.defer();
-    var configPromise = Q.nfbind(github.getConfig);
-    configPromise({
-        user: user,
-        repo: repo
+RepoSchema.methods.initConfig = function (raw, github) {
+    console.log(raw);
+    return github.config({
+        user: raw.owner.login,
+        repo: raw.name
     })
     .then(function (config) {
         that.title = config.title || that.title;
@@ -72,7 +63,6 @@ RepoSchema.methods.initConfig = function (config_url) {
     .catch(function (err) {
         console.error(err);
     });
-    return deferred.promise;
 };
 
 var Repo = mongoose.model('Repo', RepoSchema);

@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 Sync
+    
+    h2= message
+    h3= serverTime
+    
+    form(name="login", action="/sync", method="post")
+      input(type="submit", value="Login With GitHub")

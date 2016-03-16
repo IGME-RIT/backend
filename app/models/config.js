@@ -1,11 +1,15 @@
 var fs = require('fs');
 var YAML = require('yamljs');
+var Q = require('q');
+
 var Repo = require('./repo').Repo;
 var sync = require('../helpers/sync');
+var auth = require('../services/auth');
 var db = require('../services/mongo')({
     onConnect: onConnect,
     error: null
 });
+
 var lastSyncTime = process.env.LAST_SYNC || 0;
 
 function loadFile(path, file, ext) {
@@ -21,14 +25,18 @@ function onConnect() {
     Configuration.getInstance().initialized = true;
 }
 
-function open(cb) {
-    var excluded = Configuration.getInstance().excluded;
-    sync(excluded, cb);
+function open() {
+    var config = Configuration.getInstance();
+    var excluded = config.excluded;
+    var client = config.githubClient;
+    return sync(excluded, client);
 }
 
 var Configuration = (function () {
     function ConfigurationPrivate() {
         this.excluded = loadFile('config/', 'excluded_repos', 'yml');
+        this.passport = auth.passport;
+        this.githubClient = auth.github;
         this.initialized = false;
     }
 
@@ -36,18 +44,12 @@ var Configuration = (function () {
         Repo.find(opts || {}, cb);
     };
 
-    ConfigurationPrivate.prototype.sync = function (cb) {
+    ConfigurationPrivate.prototype.sync = function () {
         this.initialized = false;
-        Repo.remove({}, function (err) {
-            open(function (err, repoCount) {
-                if (err) {
-                    console.error(err);
-                    cb(err, null);
-                } else {
-                    Configuration.getInstance().initialized = true;
-                    cb(null, repoCount);
-                }
-            });
+        var that = this;
+        var removePromise = Q.nfbind(Repo.remove.bind(Repo));
+        return removePromise({}).then(open).then(function (repoCount) {
+            that.initialized = true;
         });
     }
 
