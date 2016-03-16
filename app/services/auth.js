@@ -40,7 +40,7 @@ var verify = function(accessToken, refreshToken, profile, done) {
         // and return that user instead.
         github.authorize(accessToken);
         
-        return done(null, profile);
+        return done(null, {user: profile, github: github});
     });
 };
 

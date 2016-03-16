@@ -16,30 +16,33 @@ var parseUrl = function (url) {
 }
 
 var RepoSchema = new mongoose.Schema({
-    title: {
+    title: String,
+    name: {
         type: String,
-        default: 'Unknown Repo'
+        required: true
     },
     link: {
         type: String,
-        default: GITHUB_DEFAULT
+        default: GITHUB_DEFAULT,
+        required: true
     },
     author: Author.Schema,
     description: String,
     language: String,
     image: ImageSet.Schema,
     tags: [String],
-    extra_resources: [String]
+    extra_resources: [String],
+    connections: [String]
 });
 
 RepoSchema.methods.initConfig = function (raw, github) {
-    console.log(raw);
+    var that = this;
     return github.config({
         user: raw.owner.login,
         repo: raw.name
     })
     .then(function (config) {
-        that.title = config.title || that.title;
+        that.title = config.title || that.name;
         that.author = config.author ?
             new Author.Author({
                 name: config.author.name,
@@ -57,8 +60,8 @@ RepoSchema.methods.initConfig = function (raw, github) {
             new ImageSet.ImageSet({});
         that.tags = config.tags || [];
         that.extra_resources = config.extra_resources || [];
+        that.connections = config.connections || [];
         console.log('Parsed the project config for ' + that.title);
-        deferred.resolve();
     })
     .catch(function (err) {
         console.error(err);

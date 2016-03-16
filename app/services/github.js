@@ -3,7 +3,6 @@ var Octokat = require('octokat');
 var YAML = require('yamljs');
 
 var octo = new Octokat({
-    token: "OAUTH_TOKEN"
 });
 
 module.exports = {
@@ -21,7 +20,7 @@ module.exports = {
             console.error('Can\'t get a config without a destination.');
             return;
         }
-        return octo.repos(options.user, options.repo)
+        return this.client.repos(options.user, options.repo)
             .contents('igme_config.yml')
             .read()
             .then(function(contents) {

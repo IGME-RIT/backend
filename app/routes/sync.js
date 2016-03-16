@@ -69,6 +69,7 @@ router.get('/auth',
 router.get('/auth/callback',
     passport.authenticate('github', { failureRedirect: '/' }),
     function(req, res) {
+        Configuration.githubClient = req.user.github;
         res.redirect('/sync');
     }
 );

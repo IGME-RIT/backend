@@ -1,4 +1,5 @@
 title: Cool Project
+name: cool-project
 author:
   name: Aaron Sky
   email: aaronsky@skyaaron.com
@@ -11,3 +12,6 @@ tags:
   - Data Structures
 extra_resources:
   - King Piccolo
+connections:
+  - another-cool-project
+  - a-less-cool-project

@@ -50,6 +50,7 @@ var Configuration = (function () {
         var removePromise = Q.nfbind(Repo.remove.bind(Repo));
         return removePromise({}).then(open).then(function (repoCount) {
             that.initialized = true;
+            return repoCount;
         });
     }
 
