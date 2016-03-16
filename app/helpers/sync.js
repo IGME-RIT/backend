@@ -11,31 +11,38 @@ module.exports = function(excluded, github) {
 
     var promises = [];
     
-    function incrementRepoCount() {
-        repoCount += 1;
-    }
-    
-    function createRepo(res) {
+    function getRepoPage(res) {
         var deferred = Q.defer();
         var len = res.length;
+        var repoPromises = [];
         for (var i = 0; i < len; i++) {
             var repo_raw = res[i];
             if (excluded.indexOf(repo_raw.name) !== -1) {
                 continue;
             }
-            console.log(repo_raw.name);
-            var name = repo_raw.name;
-            var link = repo_raw.htmlUrl;
-            var repo = new Repo({
-                name: name,
-                link: link
-            });
-            var config = repo.initConfig(repo_raw, github);
-            var save = Q.nfbind(repo.save.bind(repo));
-            var promise = config.then(save).then(incrementRepoCount);
-            promises.push(promise);
-            deferred.resolve();
+            repoPromises.push(createRepo(repo_raw));
         }
+        return Q.all(repoPromises);
+    }
+    
+    function createRepo(raw) {
+        var deferred = Q.defer();
+        var name = raw.name;
+        var link = raw.htmlUrl;
+        var repo = new Repo({
+            name: name,
+            link: link
+        });
+        var save = Q.nfbind(repo.save.bind(repo));
+        repo.initConfig(raw, github)
+        .then(save)
+        .then(function () {
+            repoCount += 1;
+            deferred.resolve();
+        })
+        .catch(function(err) {
+            deferred.reject(err);
+        });
         return deferred.promise;
     }
     
@@ -48,7 +55,7 @@ module.exports = function(excluded, github) {
                 .orgs('igme-rit')
                 .repos
                 .fetch(opts)
-                .then(createRepo)
+                .then(getRepoPage)
                 .then(function() {
                     if (len >= perPage) {
                         currentPage += 1;
