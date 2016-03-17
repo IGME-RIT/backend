@@ -23,9 +23,12 @@ module.exports = {
         return this.client.repos(options.user, options.repo)
             .contents('igme_config.yml')
             .read()
-            .then(function(contents) {
+            .then((contents) => {
                 var config = YAML.parse(contents);
                 return config;
+            })
+            .catch((err) => {
+                console.error(err);
             });
     }
 };

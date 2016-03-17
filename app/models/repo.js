@@ -41,8 +41,8 @@ RepoSchema.methods.initConfig = function (raw, github) {
         user: raw.owner.login,
         repo: raw.name
     })
-    .then(function (config) {
-        that.title = config.title || that.name;
+    .then((config) => {
+        that.title = config.title || this.name;
         that.author = config.author ?
             new Author.Author({
                 name: config.author.name,
@@ -63,7 +63,7 @@ RepoSchema.methods.initConfig = function (raw, github) {
         that.connections = config.connections || [];
         console.log('Parsed the project config for ' + that.title);
     })
-    .catch(function (err) {
+    .catch((err) => {
         console.error(err);
     });
 };

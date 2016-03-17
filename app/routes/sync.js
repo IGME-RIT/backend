@@ -31,14 +31,22 @@ var renderSyncPage = function(req, res) {
 
 router.get('/', isLoggedIn, function(req, res) {
     if (req.ATLUS) {
-        Configuration.sync().then(function(repoCount) {
-            req.ATLUS.repoCount = repoCount;
+        if (req.user && req.user.user) {
+            if (req.user.user.isOrgAdmin) {
+                Configuration.sync().then(function(repoCount) {
+                    req.ATLUS.repoCount = repoCount;
+                    renderSyncPage(req, res);
+                }).catch(function(err) {
+                    req.ATLUS.err = err;
+                    renderSyncPage(req, res);
+                });
+            } else {
+                req.ATLUS.err = { message: 'You\'re not an admin of the IGME-RIT organization' };
+                renderSyncPage(req, res);
+            }
+        } else {
             renderSyncPage(req, res);
-        }).catch(function(err) {
-            req.ATLUS.err = err;
-            renderSyncPage(req, res);
-        });
-        //renderSyncPage(req, res);
+        }
     } else {
         renderSyncPage(req, res);
     }
@@ -46,7 +54,7 @@ router.get('/', isLoggedIn, function(req, res) {
 
 router.post('/',
     passport.authenticate('github', {
-        scope: ['user:email'],
+        scope: ['user:email', 'read:org'],
         successRedirect: '/',
         failureRedirect: '/'
     })
@@ -58,7 +66,7 @@ router.post('/',
 //   the user to github.com.  After authorization, GitHub will redirect the user
 //   back to this application at /auth/github/callback
 router.get('/auth',
-    passport.authenticate('github', { scope: ['user:email'] })
+    passport.authenticate('github', { scope: ['user:email', 'read:org'] })
 );
 
 // GET /auth/callback

@@ -32,15 +32,24 @@ var options = {
 
 var verify = function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
-    process.nextTick(function() {
+    process.nextTick(() => {
 
         // To keep the example simple, the user's GitHub profile is returned to
         // represent the logged-in user.  In a typical application, you would want
         // to associate the GitHub account with a user record in your database,
         // and return that user instead.
         github.authorize(accessToken);
-        
-        return done(null, {user: profile, github: github});
+        github.client.orgs('igme-rit').members.fetch({role:'admin'})
+        .then((res) => {
+            for (var i = 0; i < res.length; i++) {
+                var user = res[i];
+                if (user.login === profile.username) {
+                    profile.isOrgAdmin = true;
+                    break;
+                }
+            }
+            return done(null, {user: profile, github: github});
+        });            
     });
 };
 

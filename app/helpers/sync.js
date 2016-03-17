@@ -12,38 +12,37 @@ module.exports = function(excluded, github) {
     var promises = [];
     
     function getRepoPage(res) {
-        var deferred = Q.defer();
-        var len = res.length;
+        len = res.length;
         var repoPromises = [];
         for (var i = 0; i < len; i++) {
-            var repo_raw = res[i];
-            if (excluded.indexOf(repo_raw.name) !== -1) {
+            var raw = res[i];
+            if (excluded.indexOf(raw.name) !== -1) {
                 continue;
             }
-            repoPromises.push(createRepo(repo_raw));
+            repoPromises.push(createRepo(raw));
         }
-        return Q.all(repoPromises);
+        return Promise.all(repoPromises);
     }
     
     function createRepo(raw) {
-        var deferred = Q.defer();
         var name = raw.name;
         var link = raw.htmlUrl;
         var repo = new Repo({
             name: name,
             link: link
         });
-        var save = Q.nfbind(repo.save.bind(repo));
-        repo.initConfig(raw, github)
-        .then(save)
-        .then(function () {
-            repoCount += 1;
-            deferred.resolve();
-        })
-        .catch(function(err) {
-            deferred.reject(err);
+        return repo.initConfig(raw, github)
+        .then(() => {
+            var deferred = Q.defer();
+            repo.save((err) => {
+                if (err) {
+                    deferred.reject();
+                }
+                repoCount += 1;
+                deferred.resolve();
+            });
+            return deferred.promise;
         });
-        return deferred.promise;
     }
     
     function next() {
@@ -61,12 +60,15 @@ module.exports = function(excluded, github) {
                         currentPage += 1;
                         promises.push(next());
                     }
+                })
+                .catch(function (err) {
+                    console.err(err);
                 });
     }
     
     promises.push(next());
 
-    return Q.all(promises)
+    return Promise.all(promises)
         .then(function() {
             return repoCount;
         });
