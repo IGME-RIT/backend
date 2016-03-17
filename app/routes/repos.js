@@ -2,23 +2,24 @@
 var express = require('express');
 var router = express.Router();
 
+var middleware = require('../middleware');
 var Configuration = require('../models/config').getInstance();
 
 module.exports = function(repos) {
     var getAllRepos = function(req, res) {
         if (repos) {
-            res.send(repos);
+            res.json(repos);
         } else if (Configuration.initialized) {
             Configuration.search(null, function(err, results) {
                 if (err) {
-                    res.send({
+                    res.json({
                         error: true,
                         message: err
                     });
                     console.error(err);
                     return;
                 }
-                res.send(results);
+                res.json(results);
             });
         } else {
             res.render('error', {
@@ -40,18 +41,18 @@ module.exports = function(repos) {
                     }
                 }
             });
-            res.send(results);
+            res.json(results);
         } else if (Configuration.initialized) {
             Configuration.search({ title: title }, function(err, results) {
                 if (err) {
-                    res.send({
+                    res.json({
                         error: true,
                         message: err
                     });
                     console.error(err);
                     return;
                 }
-                res.send(results);
+                res.json(results);
             });
         } else {
             res.render('error', {
@@ -61,8 +62,12 @@ module.exports = function(repos) {
         }
     };
 
-    router.get('/', getAllRepos);
-    router.get('/:title', getRepoByName);
+    router.get('/', 
+            middleware.requiresSecure, 
+            getAllRepos);
+    router.get('/:title', 
+            middleware.requiresSecure, 
+            getRepoByName);
 
     return router;
 };

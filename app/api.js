@@ -6,48 +6,49 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var csrf = require('csurf');
+
+var router = require('./routes');
 var Configuration = require('./models/config').getInstance();
 var passport = Configuration.passport;
 
 module.exports = function(repos) {
-    var repo_routes = require('./routes/repos')(repos);
-    var sync_routes = require('./routes/sync');
-
     var app = express();
-    // view engine setup
+
+    app.use(express.static(path.join(__dirname, 'public')));
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'jade');
-
     app.set('json spaces', 2);
     app.use(logger('dev'));
     app.use(cookieParser()); // read cookies (needed for auth)
     app.use(session({
-        genid: function (req) {
+        key: 'sessionid',
+        genid: function(req) {
             return uuid.v1();
         },
-        secret: 'keyboard cat',
+        secret: 'Gaia and Uranus',
         resave: true,
-        saveUninitialized: true
+        saveUninitialized: true,
+        cookie: {
+            httpOnly: true
+        }
     }));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
+    app.disable('x-powered-by');
     // Initialize Passport!  Also use passport.session() middleware, to support
     // persistent login sessions (recommended).
     app.use(passport.initialize());
     app.use(passport.session());
-    app.use(express.static(__dirname + '/public', { redirect : false }));
 
-    app.get('/', function(req, res) {
-        var payload = {
-            message: 'Atlas backend - 2016.',
-            serverTime: Date.now()
-        };
-        res.send(payload);
+
+    app.use(csrf());
+    app.use(function(err, req, res, next) {
+        if (err.code !== 'EBADCSRFTOKEN')
+            return next(err);
+        return;
     });
-
-    app.use('/repos', repo_routes);
-    app.use('/sync', sync_routes);
-
+    
     // error handlers
     // development error handler
     // will print stacktrace
@@ -70,6 +71,8 @@ module.exports = function(repos) {
             error: {}
         });
     });
+    
+    app = router(app);
 
     return app;
 }

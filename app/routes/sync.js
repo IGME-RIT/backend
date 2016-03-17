@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 
+var middleware = require('../middleware');
 var Configuration = require('../models/config').getInstance();
 var passport = Configuration.passport;
 
@@ -15,7 +16,7 @@ var isLoggedIn = function(req, res, next) {
 }
 
 var renderSyncPage = function(req, res) {
-    var options = {};
+    var options = { csrfToken: req.csrfToken() };
     if (req.ATLUS) {
         if (req.ATLUS.err) {
             options.message = req.ATLUS.err.message || 'Something went horribly wrong!';
@@ -29,30 +30,35 @@ var renderSyncPage = function(req, res) {
     res.render('sync', options);
 }
 
-router.get('/', isLoggedIn, function(req, res) {
-    if (req.ATLUS) {
-        if (req.user && req.user.user) {
-            if (req.user.user.isOrgAdmin) {
-                Configuration.sync().then(function(repoCount) {
-                    req.ATLUS.repoCount = repoCount;
+router.get('/',
+    middleware.requiresSecure,
+    isLoggedIn,
+    function(req, res) {
+        if (req.ATLUS) {
+            if (req.user && req.user.user) {
+                if (req.user.user.isOrgAdmin) {
+                    Configuration.sync().then(function(repoCount) {
+                        req.ATLUS.repoCount = repoCount;
+                        renderSyncPage(req, res);
+                    }).catch(function(err) {
+                        req.ATLUS.err = err;
+                        renderSyncPage(req, res);
+                    });
+                } else {
+                    req.ATLUS.err = { message: 'You\'re not an admin of the IGME-RIT organization' };
                     renderSyncPage(req, res);
-                }).catch(function(err) {
-                    req.ATLUS.err = err;
-                    renderSyncPage(req, res);
-                });
+                }
             } else {
-                req.ATLUS.err = { message: 'You\'re not an admin of the IGME-RIT organization' };
                 renderSyncPage(req, res);
             }
         } else {
             renderSyncPage(req, res);
         }
-    } else {
-        renderSyncPage(req, res);
     }
-});
+);
 
 router.post('/',
+    middleware.requiresSecure,
     passport.authenticate('github', {
         scope: ['user:email', 'read:org'],
         successRedirect: '/',
@@ -66,6 +72,7 @@ router.post('/',
 //   the user to github.com.  After authorization, GitHub will redirect the user
 //   back to this application at /auth/github/callback
 router.get('/auth',
+    middleware.requiresSecure,
     passport.authenticate('github', { scope: ['user:email', 'read:org'] })
 );
 
@@ -75,6 +82,7 @@ router.get('/auth',
 //   login page.  Otherwise, the primary route function will be called,
 //   which, in this example, will redirect the user to the home page.
 router.get('/auth/callback',
+    middleware.requiresSecure,
     passport.authenticate('github', { failureRedirect: '/' }),
     function(req, res) {
         Configuration.githubClient = req.user.github;

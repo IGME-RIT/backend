@@ -1,18 +1,13 @@
 /* global process */
-var fs = require('fs');
-var https = require('https');
-
-const HTTPS_OPTIONS = {
-    key: fs.readFileSync('./config/atlas-key.key'),
-    cert:  fs.readFileSync('./config/atlas-cert.crt')
-};
 
 var app = require('./app/api')();
 
-var PORT = process.env.PORT || 5000;
-/* HACK: FIX LATER */
-var HOST = 'localhost';
+var port = process.env.PORT || process.env.NODE_PORT || 5000;
 
-var server = https.createServer(HTTPS_OPTIONS, app).listen(PORT, HOST);
-
-console.log('Started Atlas server listening on %s:%s', HOST, PORT);
+app.listen(port, function (err) {
+    if (err) {
+        console.error(err);
+        throw err;
+    }
+    console.log('Listening on port ' + port);
+});
