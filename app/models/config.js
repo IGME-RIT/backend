@@ -10,8 +10,6 @@ var db = require('../services/mongo')({
     error: null
 });
 
-var lastSyncTime = process.env.LAST_SYNC || 0;
-
 function loadFile(path, file, ext) {
     if (ext == 'json')
         return require(path + file + '.' + ext);

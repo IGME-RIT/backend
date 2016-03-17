@@ -27,7 +27,7 @@ passport.deserializeUser(function(obj, done) {
 var options = {
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: "https://localhost:5000/sync/auth/callback"
+    callbackURL: "https://" + process.env.FQDN + "/sync/auth/callback"
 };
 
 var verify = function(accessToken, refreshToken, profile, done) {

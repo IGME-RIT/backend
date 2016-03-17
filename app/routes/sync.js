@@ -58,12 +58,12 @@ router.get('/',
 );
 
 router.post('/',
-    middleware.requiresSecure,
     passport.authenticate('github', {
         scope: ['user:email', 'read:org'],
         successRedirect: '/',
         failureRedirect: '/'
-    })
+    }),
+    middleware.requiresSecure
 );
 
 // GET /auth
@@ -72,8 +72,8 @@ router.post('/',
 //   the user to github.com.  After authorization, GitHub will redirect the user
 //   back to this application at /auth/github/callback
 router.get('/auth',
-    middleware.requiresSecure,
-    passport.authenticate('github', { scope: ['user:email', 'read:org'] })
+    passport.authenticate('github', { scope: ['user:email', 'read:org'] }),
+    middleware.requiresSecure
 );
 
 // GET /auth/callback
@@ -82,8 +82,8 @@ router.get('/auth',
 //   login page.  Otherwise, the primary route function will be called,
 //   which, in this example, will redirect the user to the home page.
 router.get('/auth/callback',
-    middleware.requiresSecure,
     passport.authenticate('github', { failureRedirect: '/' }),
+    middleware.requiresSecure,
     function(req, res) {
         Configuration.githubClient = req.user.github;
         res.redirect('/sync');
