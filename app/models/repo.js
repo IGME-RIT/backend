@@ -1,9 +1,8 @@
 var mongoose = require('mongoose');
 var Q = require('q');
-var github = require('../services/github.js');
-var GITHUB_DEFAULT = require('../helpers/constants.js').GITHUB_DEFAULT;
-var Author = require('./author.js');
-var ImageSet = require('./imageset.js');
+var GITHUB_DEFAULT = require('../helpers/constants').GITHUB_DEFAULT;
+var Author = require('./author');
+var ImageSet = require('./imageset');
 
 var parseUrl = function (url) {
     var comps = url.split('/', 6);
@@ -17,38 +16,33 @@ var parseUrl = function (url) {
 }
 
 var RepoSchema = new mongoose.Schema({
-    title: {
+    title: String,
+    name: {
         type: String,
-        default: 'Unknown Repo'
+        required: true
     },
     link: {
         type: String,
-        default: GITHUB_DEFAULT
+        default: GITHUB_DEFAULT,
+        required: true
     },
     author: Author.Schema,
     description: String,
     language: String,
     image: ImageSet.Schema,
     tags: [String],
-    extra_resources: [String]
+    extra_resources: [String],
+    connections: [String]
 });
 
-RepoSchema.methods.initConfig = function (config_url) {
-    if (!config_url) {
-        throw new Error("no url supplied");
-    }
-    var parsed = parseUrl(config_url);
-    var user = parsed[0];
-    var repo = parsed[1];
+RepoSchema.methods.initConfig = function (raw, github) {
     var that = this;
-    var deferred = Q.defer();
-    var configPromise = Q.nfbind(github.getConfig);
-    configPromise({
-        user: user,
-        repo: repo
+    return github.config({
+        user: raw.owner.login,
+        repo: raw.name
     })
-    .then(function (config) {
-        that.title = config.title || that.title;
+    .then((config) => {
+        that.title = config.title || this.name;
         that.author = config.author ?
             new Author.Author({
                 name: config.author.name,
@@ -66,13 +60,12 @@ RepoSchema.methods.initConfig = function (config_url) {
             new ImageSet.ImageSet({});
         that.tags = config.tags || [];
         that.extra_resources = config.extra_resources || [];
+        that.connections = config.connections || [];
         console.log('Parsed the project config for ' + that.title);
-        deferred.resolve();
     })
-    .catch(function (err) {
+    .catch((err) => {
         console.error(err);
     });
-    return deferred.promise;
 };
 
 var Repo = mongoose.model('Repo', RepoSchema);

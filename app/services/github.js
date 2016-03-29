@@ -1,52 +1,34 @@
-var GitHub = require('github');
+var Q = require('q');
+var Octokat = require('octokat');
 var YAML = require('yamljs');
-var GITHUB_DEFAULT = require('../helpers/constants.js').GITHUB_DEFAULT;
 
-var github = new GitHub({
-  version: "3.0.0"
+var octo = new Octokat({
 });
 
-/*github.authenticate({
-  type: "oauth"
-});*/
-
-
 module.exports = {
-  client: github,
-  getConfig: function(options, cb) {
-    if (!options) {
-      console.error('Can\'t get a config without a destination.');
-      return;
-    } else if (!options.user || !options.repo) {
-      console.error('Can\'t get a config without a destination.');
-      return;
-    }
-    github.repos.getContent({
-      user: options.user,
-      repo: options.repo,
-      path: 'igme_config.yml'
-    }, function(err, res) {
-      if (err || !res) {
-        console.error('content fetch failed');
-        console.error(err);
-        cb(err, null);
-        return
-      } else if (res && res.content) {
-        var encoded = new Buffer(res.content, 'base64');
-        var decoded = encoded.toString();
-        if (decoded) {
-          var config = YAML.parse(decoded);
-          if (config) {
-            cb(null, config);
-          } else {
-            cb(new Error('Could not parse decoded content'), null);
+    client: octo,
+    authorize: function(token) {
+        this.client = new Octokat({
+            token: token
+        });
+    },
+    config: function(options) {
+        if (!options) {
+            console.error('Can\'t get a config without a destination.');
             return;
-          }
-        } else {
-          cb(new Error('Could not decode content'), null);
-          return;
+        } else if (!options.user || !options.repo) {
+            console.error('Can\'t get a config without a destination.');
+            return;
         }
-      }
-    });
-  }
+        return this.client.repos(options.user, options.repo)
+            .contents('igme_config.yml')
+            .read()
+            .then((contents) => {
+                var config = YAML.parse(contents);
+                return config;
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }
 };

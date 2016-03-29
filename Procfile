@@ -1,1 +1,1 @@
-web: ./bin/jeff --heroku
+web: ./bin/atlas --heroku
