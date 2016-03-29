@@ -64,9 +64,11 @@ module.exports = function(repos) {
 
     router.get('/', 
             middleware.requiresSecure, 
+            middleware.enableCors,
             getAllRepos);
     router.get('/:title', 
             middleware.requiresSecure, 
+            middleware.enableCors,
             getRepoByName);
 
     return router;
