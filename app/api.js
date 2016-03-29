@@ -8,11 +8,12 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var csrf = require('csurf');
 
-var router = require('./routes');
 var Configuration = require('./models/config').getInstance();
 var passport = Configuration.passport;
 
 module.exports = function(repos) {
+    var router = require('./routes')(repos);
+    
     var app = express();
 
     app.use(express.static(path.join(__dirname, 'public')));
