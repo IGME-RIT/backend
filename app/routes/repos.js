@@ -1,5 +1,6 @@
 
 var express = require('express');
+var cors = require('cors');
 var router = express.Router();
 
 var middleware = require('../middleware');
@@ -61,14 +62,18 @@ module.exports = function(repos) {
             });
         }
     };
-
+    
+    
+    app.options('/', cors());
     router.get('/', 
+            cors(),
             middleware.requiresSecure, 
-            middleware.enableCors,
             getAllRepos);
+    
+    app.options('/:title', cors());
     router.get('/:title', 
+            cors(),
             middleware.requiresSecure, 
-            middleware.enableCors,
             getRepoByName);
 
     return router;
