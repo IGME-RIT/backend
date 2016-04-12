@@ -64,13 +64,13 @@ module.exports = function(repos) {
     };
     
     
-    app.options('/', cors());
+    router.options('/', cors());
     router.get('/', 
             cors(),
             middleware.requiresSecure, 
             getAllRepos);
     
-    app.options('/:title', cors());
+    router.options('/:title', cors());
     router.get('/:title', 
             cors(),
             middleware.requiresSecure, 
