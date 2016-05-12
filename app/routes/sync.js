@@ -7,21 +7,21 @@ var Configuration = require('../models/config').getInstance();
 var passport = Configuration.passport;
 
 var isLoggedIn = function(req, res, next) {
-    req.ATLUS = req.ATLUS || {};
+    req.ATLAS = req.ATLAS || {};
     if (req.isAuthenticated()) {
         return next();
     }
-    req.ATLUS.err = { message: 'User is not authenticated' };
+    req.ATLAS.err = { message: 'User is not authenticated' };
     return next();
 }
 
 var renderSyncPage = function(req, res) {
     var options = { csrfToken: req.csrfToken() };
-    if (req.ATLUS) {
-        if (req.ATLUS.err) {
-            options.message = req.ATLUS.err.message || 'Something went horribly wrong!';
-        } else if (req.ATLUS.repoCount) {
-            options.message = req.ATLUS.repoCount + ' repos were synced.';
+    if (req.ATLAS) {
+        if (req.ATLAS.err) {
+            options.message = req.ATLAS.err.message || 'Something went horribly wrong!';
+        } else if (req.ATLAS.repoCount) {
+            options.message = req.ATLAS.repoCount + ' repos were synced.';
             options.serverTime = Date.now();
         } else {
             options.message = 'You aren\'t logged in';
@@ -34,18 +34,18 @@ router.get('/',
     middleware.requiresSecure,
     isLoggedIn,
     function(req, res) {
-        if (req.ATLUS) {
+        if (req.ATLAS) {
             if (req.user && req.user.user) {
                 if (req.user.user.isOrgAdmin) {
                     Configuration.sync().then(function(repoCount) {
-                        req.ATLUS.repoCount = repoCount;
+                        req.ATLAS.repoCount = repoCount;
                         renderSyncPage(req, res);
                     }).catch(function(err) {
-                        req.ATLUS.err = err;
+                        req.ATLAS.err = err;
                         renderSyncPage(req, res);
                     });
                 } else {
-                    req.ATLUS.err = { message: 'You\'re not an admin of the IGME-RIT organization' };
+                    req.ATLAS.err = { message: 'You\'re not an admin of the IGME-RIT organization' };
                     renderSyncPage(req, res);
                 }
             } else {
