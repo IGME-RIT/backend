@@ -4,12 +4,10 @@ var Repo = require('../models/repo').Repo;
 module.exports = function(excluded, github) {
     var client = github.client;
 
-    var currentPage = 0;
+    var currentPage = 1; // Github's API has a 1-indexed paging system
     var perPage = 100;
     var repoCount = 0;
     var len = 0;
-
-    var promises = [];
     
     function getRepoPage(res) {
         len = res.length;
@@ -58,7 +56,7 @@ module.exports = function(excluded, github) {
                 .then(function() {
                     if (len >= perPage) {
                         currentPage += 1;
-                        promises.push(next());
+                        return next();
                     }
                 })
                 .catch(function (err) {
@@ -66,9 +64,7 @@ module.exports = function(excluded, github) {
                 });
     }
     
-    promises.push(next());
-
-    return Promise.all(promises)
+    return next()
         .then(function() {
             return repoCount;
         });
