@@ -1,17 +1,19 @@
+series: Intro to ATLAS
 title: Cool Project
-name: cool-project
 author:
   name: Aaron Sky
   email: aaronsky@skyaaron.com
   github: aaronsky
 description: A repo to stand the test of time
 language: C#
-banner: http://something.com/
 tags:
   - Math
   - Data Structures
 extra_resources:
-  - King Piccolo
+  - title: King Piccolo
+    link: http://dragonball.wikia.com/wiki/King_Piccolo
 connections:
-  - another-cool-project
-  - a-less-cool-project
+  - series: Intro to ATLAS
+    title: another-cool-project
+  - series: Intro to ATLAS
+    title: a-less-cool-project
