@@ -16,6 +16,7 @@ var parseUrl = function (url) {
 }
 
 var RepoSchema = new mongoose.Schema({
+    series: String,
     title: String,
     name: {
         type: String,
@@ -29,10 +30,9 @@ var RepoSchema = new mongoose.Schema({
     author: Author.Schema,
     description: String,
     language: String,
-    image: ImageSet.Schema,
     tags: [String],
-    extra_resources: [String],
-    connections: [String]
+    extra_resources: [{title: String, link: String}],
+    connections: [{series: String, title: String}]
 });
 
 RepoSchema.methods.initConfig = function (raw, github) {
@@ -42,26 +42,45 @@ RepoSchema.methods.initConfig = function (raw, github) {
         repo: raw.name
     })
     .then((config) => {
-        that.title = config.title || this.name;
-        that.author = config.author ?
-            new Author.Author({
-                name: config.author.name,
-                email: config.author.email,
-                github: config.author.github
-            }) :
-            new Author.Author({});
-        that.description = config.description || 'No description found';
-        that.language = config.language || 'None';
-        that.image = config.image ?
-            new ImageSet.ImageSet({
-                icon: config.image.icon,
-                banner: config.image.banner
-            }) :
-            new ImageSet.ImageSet({});
-        that.tags = config.tags || [];
-        that.extra_resources = config.extra_resources || [];
-        that.connections = config.connections || [];
-        console.log('Parsed the project config for ' + that.title);
+        if (typeof config !== 'undefined') {
+            that.series = config.series || that.name;
+            that.title = config.title || that.name;
+            that.author = config.author ?
+                new Author.Author({
+                    name: config.author.name,
+                    email: config.author.email,
+                    github: config.author.github
+                }) :
+                new Author.Author({});
+            that.description = config.description || 'No description found';
+            that.language = config.language || null;
+            // For the following 3 properties, yes it should be != and not !==.
+            // To see why open up a javascript console and see what the difference is between
+            //   > [][0] != null
+            // and
+            //   > [][0] !== null
+            // (hint: one returns true, the other returns false)
+            that.tags = (config.tags && (config.tags.constructor === Array) && (config.tags[0] != null)) ? config.tags : [];
+            that.extra_resources = (config.extra_resources && (config.extra_resources.constructor === Array) && (config.extra_resources[0] != null)) ?
+                                    ((config.extra_resources[0].title && config.extra_resources[0].link) ? config.extra_resources
+                                     : config.extra_resources.map(link => { return {title: "", link: link}}))
+                                    : [];
+            that.connections = (config.connections && (config.connections.constructor === Array) && (config.connections[0] != null)) ?
+                                    ((config.connections[0].series && config.connections[0].title) ? config.connections
+                                     : config.connections.map(title => { return {series: "", title: title}}))
+                                    : [];
+            console.log('Parsed the project config for ' + that.title);
+        } else {
+            that.title = that.name;
+            that.series = that.name;
+            that.author = new Author.Author({});
+            that.description = 'No description found';
+            that.language = null;
+            that.tags = [];
+            that.extra_resources = [];
+            that.connections = [];
+            console.log('No igme_config.yml for ' + that.name);
+        }
     })
     .catch((err) => {
         console.error(err);
