@@ -63,7 +63,7 @@ RepoSchema.methods.initConfig = function (raw, github) {
             that.tags = (config.tags && (config.tags.constructor === Array) && (config.tags[0] != null)) ? config.tags : [];
             that.extra_resources = (config.extra_resources && (config.extra_resources.constructor === Array) && (config.extra_resources[0] != null)) ?
                                     ((config.extra_resources[0].title && config.extra_resources[0].link) ? config.extra_resources
-                                     : config.extra_resources.map(link => { return {title: "", link: link}}))
+                                     : config.extra_resources.map(link => { return {title: link, link: link}}))
                                     : [];
             that.connections = (config.connections && (config.connections.constructor === Array) && (config.connections[0] != null)) ?
                                     ((config.connections[0].series && config.connections[0].title) ? config.connections
