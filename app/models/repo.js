@@ -67,7 +67,7 @@ RepoSchema.methods.initConfig = function (raw, github) {
                                     : [];
             that.connections = (config.connections && (config.connections.constructor === Array) && (config.connections[0] != null)) ?
                                     ((config.connections[0].series && config.connections[0].title) ? config.connections
-                                     : config.connections.map(title => { return {series: "", title: title}}))
+                                     : config.connections.map(title => { return {series: title, title: title}}))
                                     : [];
             console.log('Parsed the project config for ' + that.title);
         } else {
