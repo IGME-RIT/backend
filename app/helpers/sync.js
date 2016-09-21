@@ -60,7 +60,7 @@ module.exports = function(excluded, github) {
                     }
                 })
                 .catch(function (err) {
-                    console.err(err);
+                    console.error(err);
                 });
     }
     
