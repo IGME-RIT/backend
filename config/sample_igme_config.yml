@@ -14,6 +14,6 @@ extra_resources:
     link: http://dragonball.wikia.com/wiki/King_Piccolo
 connections:
   - series: Intro to ATLAS
-    title: another-cool-project
+    title: Another Cool Project
   - series: Intro to ATLAS
-    title: a-less-cool-project
+    title: A Less Cool Project
