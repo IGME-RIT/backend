@@ -57,7 +57,6 @@ module.exports = function(excluded, github) {
                     }
                 })
                 .catch(function (err) {
-                    console.log(currentPage);
                     console.error(err);
                 });
     }
