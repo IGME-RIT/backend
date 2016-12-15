@@ -32,13 +32,10 @@ module.exports = function(excluded, github) {
         return repo.initConfig(raw, github)
         .then(() => {
             var deferred = Q.defer();
-            repo.save((err) => {
-                if (err) {
-                    deferred.reject();
-                }
-                repoCount += 1;
+            repo.save(() => {
                 deferred.resolve();
-            });
+                repoCount += 1;
+            })
             return deferred.promise;
         });
     }
