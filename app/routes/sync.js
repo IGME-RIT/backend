@@ -7,7 +7,9 @@ var Configuration = require('../models/config').getInstance();
 var passport = Configuration.passport;
 
 var isLoggedIn = function(req, res, next) {
-    req.ATLAS = req.ATLAS || {};
+    req.ATLAS = req.ATLAS || {}; // If the ATLAS object on the request doesn't already exist, create it
+    // There's nearly no documentation anywhere for this method.
+    // Just know it's part of passport.js and does what it says on the tin
     if (req.isAuthenticated()) {
         return next();
     }
@@ -27,9 +29,11 @@ var renderSyncPage = function(req, res) {
             options.message = 'You aren\'t logged in';
         }
     }
+    // Renders a view and sends the rendered HTML string to the client
     res.render('sync', options);
 }
 
+// GET /sync
 router.get('/',
     middleware.requiresSecure,
     isLoggedIn,
