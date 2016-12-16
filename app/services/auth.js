@@ -1,3 +1,4 @@
+// This file serves to authenticate the logged in user and check if they are an igme-rit admin
 
 var passport = require('passport');
 var GitHubStrategy = require('passport-github2').Strategy;

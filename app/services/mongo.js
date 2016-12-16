@@ -1,3 +1,5 @@
+// This file serves to actually make the connection between our app and the Mongo database it uses.
+
 var mongoose = require("mongoose");
 
 /*

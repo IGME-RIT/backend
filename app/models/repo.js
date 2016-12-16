@@ -1,7 +1,13 @@
+// mongoose, in addition to setting up the connection to mongodb, is also used to define the kinds of objects
+// that we store there.
+// These definitions are called Schemas.
 var mongoose = require('mongoose');
 var Q = require('q');
 var GITHUB_DEFAULT = require('../helpers/constants').GITHUB_DEFAULT;
 var Author = require('./author');
+
+// OBSOLETE
+// TESTING REQUIRED BEFORE REMOVAL
 var ImageSet = require('./imageset');
 
 var parseUrl = function (url) {
@@ -60,6 +66,13 @@ RepoSchema.methods.initConfig = function (raw, github) {
             // and
             //   > [][0] !== null
             // (hint: one returns true, the other returns false)
+            // In general, these follow the following logic:
+            //   Does the thing even exist?
+            //   Is it an array?
+            //   Is it a non-empty array?
+            //   Does the first element have the correct format (if so, we'll assume they all do)?
+            //   If so, return the raw response.
+            //   Otherwise .map it to be correct
             that.tags = (config.tags && (config.tags.constructor === Array) && (config.tags[0] != null)) ? config.tags : [];
             that.extra_resources = (config.extra_resources && (config.extra_resources.constructor === Array) && (config.extra_resources[0] != null)) ?
                                     ((config.extra_resources[0].title && config.extra_resources[0].link) ? config.extra_resources
@@ -89,6 +102,8 @@ RepoSchema.methods.initConfig = function (raw, github) {
 
 var Repo = mongoose.model('Repo', RepoSchema);
 
+// Before saving a repo, check to see if it already exists.
+// If it does, don't save it again.
 RepoSchema.pre('save', function (next) {
     var that = this;
     Repo.find({ title: that.title, link: that.link }, function (err, docs) {

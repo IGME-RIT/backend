@@ -1,5 +1,15 @@
+// The top level file for the config "half"
+// Configuration is a singleton object that manages MongoDB
+
+// fs is the Node filesystem. Not currently in use
+// TODO test to see if it can be removed safely?
 var fs = require('fs');
+
+// For loading excluded_repos.yml
 var YAML = require('yamljs');
+
+// A promise library
+// The only method used in this file is Q.nfbind
 var Q = require('q');
 
 var Repo = require('./repo').Repo;
@@ -10,6 +20,7 @@ var db = require('../services/mongo')({
     error: null
 });
 
+// A helper to load json or yml files
 function loadFile(path, file, ext) {
     if (ext == 'json')
         return require(path + file + '.' + ext);
@@ -30,6 +41,7 @@ function open() {
     return sync(excluded, client);
 }
 
+// Configuration follows the singleton pattern
 var Configuration = (function () {
     function ConfigurationPrivate() {
         this.excluded = loadFile('config/', 'excluded_repos', 'yml');
@@ -45,6 +57,7 @@ var Configuration = (function () {
     ConfigurationPrivate.prototype.sync = function () {
         this.initialized = false;
         var that = this;
+        // Creates a promise-returning function from a Node.js-style function
         var removePromise = Q.nfbind(Repo.remove.bind(Repo));
         return removePromise({}).then(open).then(function (repoCount) {
             that.initialized = true;
@@ -52,6 +65,7 @@ var Configuration = (function () {
         });
     }
 
+    // This is where the singleton is stored
     var instance;
 
     function initInstance() {

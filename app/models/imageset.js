@@ -1,3 +1,7 @@
+// This file definse a mongoose Schema for images, which used to be a part of igme_config.yml
+// However, we realized that we could just hard-code accessing igme_thumbnail.png as part of the repo,
+// so this file is now obsolete.
+
 var mongoose = require('mongoose');
 
 var ImageSetSchema = new mongoose.Schema({

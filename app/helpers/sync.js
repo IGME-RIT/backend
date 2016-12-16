@@ -1,3 +1,5 @@
+// This file is what performs the actual GitHub scraping, getting data and passing it to the Repo ctor
+
 var Q = require('q');
 var Repo = require('../models/repo').Repo;
 
@@ -9,6 +11,7 @@ module.exports = function(excluded, github) {
     var repoCount = 0;
     var len = 0;
     
+    // res holds the response from github of the .fetch method of the github client
     function getRepoPage(res) {
         len = res.length;
         var repoPromises = [];
